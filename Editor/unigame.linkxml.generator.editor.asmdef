@@ -2,8 +2,7 @@
     "name": "unigame.linkxml.generator.editor",
     "rootNamespace": "",
     "references": [
-        "GUID:003f9352b89cc4e4683d1bd48e57492b",
-        "unigame.linkxml.generator"
+        "GUID:003f9352b89cc4e4683d1bd48e57492b"
     ],
     "includePlatforms": [
         "Editor"
