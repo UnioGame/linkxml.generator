@@ -30,12 +30,7 @@ add into your `manifest.json` dependencies section:
    - Right-click in Project window → Create → UniGame/Tools/Link Xml Generator Asset
 2. **Configure Resources**: The modern UI Toolkit editor provides an enhanced interface:
    - **Search & Filter**: Real-time search by value to quickly find resources
-   - **Quick Add Buttons**: Convenient "Add [Type]" buttons for all resource types
-   - **Visual Management**: Enable/disable toggles with alternating row backgrounds
-   - **Drag & Drop**: Reorder resources by dragging (disabled during search)
-   - **Smart Editing**: Context-aware tooltips and inline editing
-   - **Easy Cleanup**: Delete unwanted resources with the "×" button
-   - **Live Counter**: See total/filtered resource count in real-time
+   - **Add Buttons**: Convenient "Add [Type]" buttons for all resource types
 3. **Generate**: Click the prominent "Generate Link XML" button or use context menu
 
 #### Adding Resources in Inspector:
