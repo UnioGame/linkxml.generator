@@ -1,0 +1,90 @@
+.linkxml-generator-header {
+    font-size: 16px;
+    -unity-font-style: bold;
+    margin-bottom: 10px;
+    color: rgb(200, 200, 200);
+}
+
+.linkxml-generator-button {
+    height: 30px;
+    margin-bottom: 15px;
+    background-color: rgb(76, 153, 76);
+    color: white;
+    border-radius: 5px;
+    border-width: 0;
+}
+
+.linkxml-generator-button:hover {
+    background-color: rgb(96, 173, 96);
+}
+
+.linkxml-generator-add-button {
+    height: 25px;
+    flex-grow: 1;
+    margin-right: 5px;
+    background-color: rgb(64, 128, 192);
+    color: white;
+    border-radius: 3px;
+    border-width: 0;
+}
+
+.linkxml-generator-add-button:hover {
+    background-color: rgb(84, 148, 212);
+}
+
+.linkxml-generator-add-button:last-child {
+    margin-right: 0;
+}
+
+.linkxml-resource-item {
+    flex-direction: row;
+    align-items: center;
+    padding: 5px;
+    background-color: rgba(51, 51, 51, 0.3);
+    margin-bottom: 2px;
+    border-radius: 3px;
+}
+
+.linkxml-resource-item:hover {
+    background-color: rgba(51, 51, 51, 0.5);
+}
+
+.linkxml-delete-button {
+    width: 25px;
+    height: 25px;
+    margin-left: 10px;
+    background-color: rgb(204, 76, 76);
+    color: white;
+    font-size: 14px;
+    -unity-font-style: bold;
+    border-radius: 3px;
+    border-width: 0;
+}
+
+.linkxml-delete-button:hover {
+    background-color: rgb(224, 96, 96);
+}
+
+.linkxml-resource-content {
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+.linkxml-resource-type {
+    margin-bottom: 5px;
+}
+
+.linkxml-resources-container {
+    border-width: 1px;
+    border-color: rgb(77, 77, 77);
+    border-radius: 5px;
+    padding: 5px;
+    min-height: 200px;
+}
+
+.linkxml-section-header {
+    font-size: 14px;
+    -unity-font-style: bold;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}

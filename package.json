@@ -1,0 +1,18 @@
+{
+  "name": "com.unigame.linkxml.generator",
+  "author": "UniGame",
+  "displayName": "UniGame Link XML Generator",
+  "description": "Generates link.xml files for Unity projects",
+  "unity": "2023.2",
+  "version": "2025.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UnioGame/linkxml.generator"
+  },
+  "keywords": [
+    "linker",
+    "link.xml",
+    "tool"
+  ],
+  "homepage": "https://github.com/UnioGame/linkxml.generator/blob/main/README.md"
+}

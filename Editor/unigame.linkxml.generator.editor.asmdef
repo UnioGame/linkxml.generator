@@ -1,0 +1,18 @@
+{
+    "name": "unigame.linkxml.generator.editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:003f9352b89cc4e4683d1bd48e57492b"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
