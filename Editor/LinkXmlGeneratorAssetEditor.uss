@@ -49,6 +49,19 @@
     background-color: rgba(51, 51, 51, 0.5);
 }
 
+.linkxml-resource-item-even {
+    flex-direction: row;
+    align-items: center;
+    padding: 5px;
+    background-color: rgba(85, 85, 85, 0.4);
+    margin-bottom: 2px;
+    border-radius: 3px;
+}
+
+.linkxml-resource-item-even:hover {
+    background-color: rgba(85, 85, 85, 0.6);
+}
+
 .linkxml-delete-button {
     width: 25px;
     height: 25px;
@@ -87,4 +100,16 @@
     -unity-font-style: bold;
     margin-bottom: 5px;
     margin-top: 10px;
+}
+
+.linkxml-search-field {
+    border-radius: 3px;
+    border-width: 1px;
+    border-color: rgb(77, 77, 77);
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.linkxml-search-field:focus {
+    border-color: rgb(64, 128, 192);
 }

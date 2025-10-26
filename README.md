@@ -2,25 +2,25 @@
 
 An advanced link.xml file generator for Unity projects with support for multiple resource types and automated section management.
 
+![Link XML Generator Editor](https://i.ibb.co/wFnqqjVr/linkxmlgenerator.png)
+
 ## Overview
 
 `LinkXmlGenerator` is a Unity Editor utility that automatically generates and updates the `link.xml` file required for proper IL2CPP builds. The generator supports various resource types and preserves existing manual rules in the file. It also includes `LinkXmlGeneratorAsset` - a ScriptableObject-based solution for easy configuration through Unity Inspector.
 
 ## Features
 
-- ✅ **Safe Updates**: Only overwrites the automatically generated section between markers
-- ✅ **Manual Rules Preservation**: Doesn't affect user rules outside the automatic section  
-- ✅ **Automatic Creation**: Creates `link.xml` and `Assets` directory if they don't exist
 - ✅ **Multiple Resource Types**: Support for namespaces, types, assemblies, regex patterns, and base types
-- ✅ **Editor Code Exclusion**: Automatically skips types from Editor assemblies
-- ✅ **Backward Compatibility**: Support for legacy API
 - ✅ **ScriptableObject Asset**: Easy configuration through Unity Inspector with `LinkXmlGeneratorAsset`
-- ✅ **Custom UI Toolkit Editor**: Enhanced UI with custom editor interface
 
 ## Installation
 
-1. Place `LinkXmlGenerator.cs` and `LinkXmlGeneratorAsset.cs` in an `Editor` folder of your project
-2. Files will only be available in Editor mode (thanks to `#if UNITY_EDITOR`)
+add into your `manifest.json` dependencies section:
+
+```
+"com.unigame.linkxml.generator": "https://github.com/UnioGame/linkxml.generator"
+```
+
 
 ## Usage
 
@@ -28,12 +28,14 @@ An advanced link.xml file generator for Unity projects with support for multiple
 
 1. **Create Asset**: 
    - Right-click in Project window → Create → UniGame/Tools/Link Xml Generator Asset
-2. **Configure Resources**: The custom UI Toolkit editor provides an enhanced interface:
-   - Use convenient "Add [Type]" buttons to quickly add resources
-   - Each resource has an enable/disable toggle for easy management
-   - Drag and drop to reorder resources in the list
-   - Real-time editing with context-aware placeholders
-   - Delete unwanted resources with the "×" button
+2. **Configure Resources**: The modern UI Toolkit editor provides an enhanced interface:
+   - **Search & Filter**: Real-time search by value to quickly find resources
+   - **Quick Add Buttons**: Convenient "Add [Type]" buttons for all resource types
+   - **Visual Management**: Enable/disable toggles with alternating row backgrounds
+   - **Drag & Drop**: Reorder resources by dragging (disabled during search)
+   - **Smart Editing**: Context-aware tooltips and inline editing
+   - **Easy Cleanup**: Delete unwanted resources with the "×" button
+   - **Live Counter**: See total/filtered resource count in real-time
 3. **Generate**: Click the prominent "Generate Link XML" button or use context menu
 
 #### Adding Resources in Inspector:
@@ -125,14 +127,6 @@ LinkXmlResource.FromAssembly("MyProject.Runtime")
 </linker>
 ```
 
-## Unity Editor Menu
-
-The generator includes an example menu in Unity Editor:
-
-**Tools → Link XML → Generate from Resources [example]**
-
-This example can be used as a template for creating your own configurations.
-
 ## LinkXmlGeneratorAsset Configuration
 
 ### Creating and Using the Asset
@@ -152,26 +146,6 @@ The custom UI Toolkit editor provides convenient buttons:
 - **Add Assembly Resource**: Add an entire assembly resource
 - **Add Concrete Type Resource**: Add a specific type resource
 
-### Custom UI Toolkit Editor
-The package includes a custom editor built with UI Toolkit that provides:
-- Enhanced visual interface with styled buttons and controls
-- Real-time editing of resources with immediate feedback
-- Drag-and-drop reordering of resources
-- Individual enable/disable toggles for each resource
-- Context-aware placeholders for different resource types
-- Clean, modern Unity-style interface
-
-## Backward Compatibility
-
-The old API still works but is marked as deprecated:
-```csharp
-[System.Obsolete("Use GenerateFromResources instead")]
-public static void GenerateByNamespacesGlobalTypesAndBaseTypes(
-    IEnumerable<string> namespacePrefixes,
-    IEnumerable<string> globalTypeNames,
-    IEnumerable<Type> baseTypes)
-```
-
 The `LinkXmlGeneratorAsset` also maintains backward compatibility with legacy `Namespaces` and `Types` arrays.
 
 ## Exclusion Logic
@@ -181,101 +155,6 @@ The generator automatically excludes:
 - **Editor types**: Types from `UnityEditor.*` namespace
 - **Generic definitions**: Open generic types (only concrete types are included)
 - **Dynamic assemblies**: Assemblies created at runtime
-
-## Error Handling
-
-- ✅ Automatic file and directory creation
-- ✅ Detailed operation logging
-- ✅ Graceful handling of reflection errors
-- ✅ XML structure validation
-- ✅ Error recovery
-
-## Usage Recommendations
-
-### 1. Create a dedicated configuration class
-```csharp
-public static class ProjectLinkXmlConfig
-{
-    [MenuItem("MyProject/Generate Link XML")]
-    public static void GenerateProjectLinkXml()
-    {
-        var resources = GetProjectResources();
-        LinkXmlGenerator.GenerateFromResources(resources);
-    }
-    
-    private static LinkXmlResource[] GetProjectResources()
-    {
-        return new[]
-        {
-            // Your project settings
-        };
-    }
-}
-```
-
-### 2. Use in CI/CD
-```csharp
-// For automated builds
-public static void GenerateLinkXmlForBuild()
-{
-    var resources = new[] { /* ... */ };
-    LinkXmlGenerator.GenerateFromResources(resources);
-}
-```
-
-### 3. Combine different resource types
-```csharp
-var resources = new[]
-{
-    // Core systems via namespace
-    LinkXmlResource.FromNamespace("MyProject.Core"),
-    
-    // Specific types
-    LinkXmlResource.FromConcreteType("ImportantSingleton"),
-    
-    // Architectural patterns via regex
-    LinkXmlResource.FromRegex(@".*Controller$"),
-    LinkXmlResource.FromRegex(@".*Service$"),
-    
-    // External libraries entirely
-    LinkXmlResource.FromAssembly("ThirdParty.Library"),
-};
-```
-
-### 4. Use ScriptableObject Assets for team collaboration
-Create `LinkXmlGeneratorAsset` files for different configurations:
-- `CoreSystemsLinkXml.asset` - Core game systems
-- `UISystemsLinkXml.asset` - UI-related types
-- `NetworkingLinkXml.asset` - Network serialization types
-
-## Debugging
-
-All operations are logged to Unity Console:
-- `[LinkXmlGenerator] Created directory: ...`
-- `[LinkXmlGenerator] Created new link.xml file at: ...`
-- `[LinkXmlGenerator] link.xml updated successfully at: ...`
-- `[LinkXmlGenerator] No resources provided for generation.`
-- `[LinkXmlGenerator] Failed to update link.xml: ...`
-
-Asset-specific logs:
-- `[AssetName] No resources configured for link.xml generation.`
-- `[AssetName] Generating link.xml with X resources...`
-
-## File Locations
-
-- **Generator**: `Assets/Editor/LinkXmlGenerator.cs` (or any Editor folder)
-- **Asset Script**: `Assets/Editor/LinkXmlGeneratorAsset.cs` (or any Editor folder)
-- **Configuration Assets**: Anywhere in the project (recommended: `Assets/Settings/LinkXml/`)
-- **Result**: `Assets/link.xml` (Unity's standard location)
-
-## Best Practices
-
-1. **Use ScriptableObject assets** for team configurations
-2. **Organize by domain** - create separate assets for different systems
-3. **Version control** your `LinkXmlGeneratorAsset` files
-4. **Test before builds** - run generation and verify the resulting `link.xml`
-5. **Document your regex patterns** - use clear, commented expressions
-6. **Prefer specific over broad** - use concrete types over wide namespace includes when possible
 
 ---
 

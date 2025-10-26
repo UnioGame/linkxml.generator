@@ -12,6 +12,8 @@ namespace UniGame.Editor
         private VisualElement root;
         private ListView resourcesListView;
         private LinkXmlGeneratorAsset targetAsset;
+        private TextField searchField;
+        private System.Collections.Generic.List<LinkXmlResourceSettings> filteredResources;
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -51,6 +53,54 @@ namespace UniGame.Editor
             var resourcesHeader = new Label("Resources");
             resourcesHeader.AddToClassList("linkxml-section-header");
             root.Add(resourcesHeader);
+
+            // Search container
+            var searchContainer = new VisualElement
+            {
+                style = 
+                {
+                    flexDirection = FlexDirection.Row,
+                    marginBottom = 10
+                }
+            };
+
+            searchField = new TextField("Search by Value:")
+            {
+                style = { flexGrow = 1, marginRight = 5 }
+            };
+            searchField.AddToClassList("linkxml-search-field");
+            searchField.tooltip = "Filter resources by their string value";
+            searchField.RegisterValueChangedCallback(OnSearchChanged);
+
+            var clearButton = new Button(() => 
+            {
+                searchField.value = "";
+                RefreshFilteredList();
+            })
+            {
+                text = "Clear",
+                style = { width = 50 }
+            };
+            clearButton.AddToClassList("linkxml-generator-add-button");
+
+            searchContainer.Add(searchField);
+            searchContainer.Add(clearButton);
+            root.Add(searchContainer);
+
+            // Search results counter
+            var counterLabel = new Label()
+            {
+                style = 
+                {
+                    fontSize = 12,
+                    color = new StyleColor(new Color(0.7f, 0.7f, 0.7f)),
+                    marginBottom = 5
+                }
+            };
+            root.Add(counterLabel);
+            
+            // Store reference for updates
+            searchField.userData = counterLabel;
 
             // Add resource buttons container
             var buttonsContainer = new VisualElement
@@ -112,6 +162,7 @@ namespace UniGame.Editor
             root.Add(buttonsContainer2);
 
             // Resources list
+            InitializeFilteredResources();
             CreateResourcesList();
 
             return root;
@@ -124,17 +175,21 @@ namespace UniGame.Editor
 
             resourcesListView = new ListView
             {
-                itemsSource = targetAsset.Resources,
+                itemsSource = filteredResources,
                 fixedItemHeight = 80,
                 reorderable = true,
                 showBorder = false,
                 style = { flexGrow = 1 }
             };
 
+            // Handle reordering - only when not filtering
+            resourcesListView.itemsSourceChanged += OnItemsSourceChanged;
+            resourcesListView.onItemsChosen += OnItemsChosen;
+
             resourcesListView.makeItem = () =>
             {
                 var container = new VisualElement();
-                container.AddToClassList("linkxml-resource-item");
+                // Style will be applied in bindItem for alternating rows
 
                 var enabledToggle = new Toggle
                 {
@@ -169,10 +224,23 @@ namespace UniGame.Editor
 
             resourcesListView.bindItem = (element, index) =>
             {
-                if (index >= targetAsset.Resources.Count) return;
+                if (index >= filteredResources.Count) return;
 
-                var resource = targetAsset.Resources[index];
+                var resource = filteredResources[index];
                 var container = element;
+                
+                // Apply alternating row styles
+                container.RemoveFromClassList("linkxml-resource-item");
+                container.RemoveFromClassList("linkxml-resource-item-even");
+                
+                if (index % 2 == 0)
+                {
+                    container.AddToClassList("linkxml-resource-item");
+                }
+                else
+                {
+                    container.AddToClassList("linkxml-resource-item-even");
+                }
                 var enabledToggle = container.Q<Toggle>();
                 var contentContainer = container.Q<VisualElement>();
                 var typeField = contentContainer.Q<EnumField>();
@@ -205,11 +273,12 @@ namespace UniGame.Editor
 
                 deleteButton.clicked += () =>
                 {
-                    if (index >= 0 && index < targetAsset.Resources.Count)
+                    if (index >= 0 && index < filteredResources.Count)
                     {
-                        targetAsset.Resources.RemoveAt(index);
+                        var resourceToRemove = filteredResources[index];
+                        targetAsset.Resources.Remove(resourceToRemove);
                         EditorUtility.SetDirty(targetAsset);
-                        resourcesListView.RefreshItems();
+                        RefreshFilteredList();
                     }
                 };
             };
@@ -252,10 +321,10 @@ namespace UniGame.Editor
 
             targetAsset.Resources.Add(newResource);
             EditorUtility.SetDirty(targetAsset);
-            resourcesListView.RefreshItems();
+            RefreshFilteredList();
             
             // Scroll to the newly added item
-            resourcesListView.ScrollToItem(targetAsset.Resources.Count - 1);
+            resourcesListView.ScrollToItem(filteredResources.Count - 1);
         }
 
         private string GetDefaultValue(LinkXmlResourceType type)
@@ -275,6 +344,71 @@ namespace UniGame.Editor
                 default:
                     return "";
             }
+        }
+
+        private void InitializeFilteredResources()
+        {
+            filteredResources = new System.Collections.Generic.List<LinkXmlResourceSettings>(targetAsset.Resources);
+        }
+
+        private void RefreshFilteredList()
+        {
+            var searchText = searchField?.value?.ToLower() ?? "";
+            
+            if (string.IsNullOrEmpty(searchText))
+            {
+                filteredResources.Clear();
+                filteredResources.AddRange(targetAsset.Resources);
+                // Enable reordering when not filtering
+                if (resourcesListView != null)
+                    resourcesListView.reorderable = true;
+            }
+            else
+            {
+                filteredResources.Clear();
+                filteredResources.AddRange(targetAsset.Resources.Where(r => 
+                    r.StringValue != null && r.StringValue.ToLower().Contains(searchText)));
+                // Disable reordering when filtering to avoid confusion
+                if (resourcesListView != null)
+                    resourcesListView.reorderable = false;
+            }
+            
+            // Update counter
+            var counterLabel = searchField?.userData as Label;
+            if (counterLabel != null)
+            {
+                if (string.IsNullOrEmpty(searchText))
+                {
+                    counterLabel.text = $"Total: {filteredResources.Count} resources";
+                }
+                else
+                {
+                    counterLabel.text = $"Found: {filteredResources.Count} of {targetAsset.Resources.Count} resources";
+                }
+            }
+            
+            resourcesListView?.RefreshItems();
+        }
+
+        private void OnSearchChanged(ChangeEvent<string> evt)
+        {
+            RefreshFilteredList();
+        }
+
+        private void OnItemsSourceChanged()
+        {
+            // Update original list when items are reordered, but only if no search filter is active
+            if (filteredResources != null && string.IsNullOrEmpty(searchField?.value))
+            {
+                targetAsset.Resources.Clear();
+                targetAsset.Resources.AddRange(filteredResources);
+                EditorUtility.SetDirty(targetAsset);
+            }
+        }
+
+        private void OnItemsChosen(System.Collections.Generic.IEnumerable<object> items)
+        {
+            // Handle item selection if needed
         }
     }
 }
